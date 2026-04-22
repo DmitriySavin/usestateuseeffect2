@@ -24,6 +24,8 @@ const App = () => {
   const [number, setNumber] = useState("");
   const [filter, setFilter] = useState("");
 
+
+  export const contacts = contacts;
   useEffect(() => {
     localStorage.setItem("contacts", JSON.stringify(contacts));
   }, [contacts]);
