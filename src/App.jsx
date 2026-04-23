@@ -1,34 +1,35 @@
+import styles from "../src/App.module.css";
 import { nanoid } from "nanoid";
 import { useState, useEffect } from "react";
 import { Contact } from "./components/Contact/Contact";
 import { Filter } from "./components/Filter/Filter";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-import styles from '../src/App.module.css'
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { addContacts } from "./Redux/actions";
 
 const App = () => {
-  const [contacts, setContacts] = useState(() => {
-    const data = localStorage.getItem("contacts");
+  // const [contacts, setContacts] = useState(() => {
+  //   const data = localStorage.getItem("contacts");
 
-    if (data) {
-      return JSON.parse(data);
-    } else {
-      return [
-        { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-        { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-        { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-        { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
-      ];
-    }
-  });
+  //   if (data) {
+  //     return JSON.parse(data);
+  //   } else {
+  //     return [
+  //       { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
+  //       { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
+  //       { id: "id-3", name: "Eden Clements", number: "645-17-79" },
+  //       { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
+  //     ];
+  //   }
+  // });
+
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [filter, setFilter] = useState("");
 
-
-  export const contacts = contacts;
-  useEffect(() => {
-    localStorage.setItem("contacts", JSON.stringify(contacts));
-  }, [contacts]);
+  const dispatch = useDispatch();
+  const initialContacts = useSelector((state) => state);
 
   const changeName = (name) => {
     setName(name);
@@ -38,37 +39,57 @@ const App = () => {
     setNumber(number);
   };
 
-  const addContacts = (event) => {
-    event.preventDefault();
+  // -----------------------
 
-    const normalizedName = name.trim().toLowerCase();
-    const normalizedNumber = number.trim();
+  const addContacts = (e) => {
+    e.preventDefault();
 
-    const nameExist = contacts.some(
-      (contact) => contact.name.toLowerCase() === normalizedName,
-    );
-    const numberExist = contacts.some(
-      (contact) => contact.number === normalizedNumber,
-    );
-
-    if (nameExist) {
-      toast.error("The name is currenty in use");
+    if (initialContacts.some(({ name }) => name.toLowerCase().includes(name))) {
       return;
     }
 
-    if (numberExist) {
-      toast.error("The number is currenty in use");
-      return;
-    }
-
-    setContacts([
-      ...contacts,
-      { name: normalizedName, number: normalizedNumber, id: nanoid() },
-    ]);
-
-    setName("");
-    setNumber("");
+    dispatch({
+      type: "tasks/addTask",
+      payload: { name, number, id: nanoid() },
+    });
   };
+
+  //
+  // useEffect(() => {
+  //   localStorage.setItem("contacts", JSON.stringify(contacts));
+  // }, [contacts]);
+
+  // const addContacts = (event) => {
+  //   event.preventDefault();
+
+  //   const normalizedName = name.trim().toLowerCase();
+  //   const normalizedNumber = number.trim();
+
+  //   const nameExist = contacts.some(
+  //     (contact) => contact.name.toLowerCase() === normalizedName,
+  //   );
+  //   const numberExist = contacts.some(
+  //     (contact) => contact.number === normalizedNumber,
+  //   );
+
+  //   if (nameExist) {
+  //     toast.error("The name is currenty in use");
+  //     return;
+  //   }
+
+  //   if (numberExist) {
+  //     toast.error("The number is currenty in use");
+  //     return;
+  //   }
+
+  //   setContacts([
+  //     ...contacts,
+  //     { name: normalizedName, number: normalizedNumber, id: nanoid() },
+  //   ]);
+
+  //   setName("");
+  //   setNumber("");
+  // };
 
   const changeFilter = (filterName) => {
     setFilter(filterName);
@@ -76,13 +97,13 @@ const App = () => {
 
   const normalizeFilter = filter.toLowerCase();
 
-  const visibleContacts = contacts.filter(({ name }) =>
+  const visibleContacts = initialContacts.filter(({ name }) =>
     name.toLowerCase().includes(normalizeFilter),
   );
 
-  const deleteContact = (contactId) => {
-    setContacts((prev) => prev.filter((contact) => contact.id !== contactId));
-  };
+  // const deleteContact = (contactId) => {
+  //   setContacts((prev) => prev.filter((contact) => contact.id !== contactId));
+  // };
 
   return (
     <>
@@ -119,7 +140,6 @@ const App = () => {
             name={contact.name}
             number={contact.number}
             contactId={contact.id}
-            deleteContact={deleteContact}
           />
         ))}
       </ul>

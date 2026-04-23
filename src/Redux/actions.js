@@ -1,12 +1,12 @@
 import { nanoid } from "nanoid";
 
-export const addTask = (name) => {
+export const addContacts = (name, number) => {
   return {
     type: "tasks/addTask",
     payload: {
       name,
       number,
-      id: nanoid(),
+      id,
     },
   };
 };
@@ -17,3 +17,4 @@ export const deleteTask = (contactId) => {
     payload: contactId,
   };
 };
+
